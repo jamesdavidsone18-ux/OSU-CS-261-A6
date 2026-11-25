@@ -95,15 +95,48 @@ class HashMap:
         index = initial_index
         j = 0
         first_tomb = None
+        while self._buckets[index] is not None:
+            if self._buckets[index].is_tombstone is True:
+                if first_tomb is None:
+                    first_tomb = index
 
+            if self._buckets[index].key == key and self._buckets[index].is_tombstone is False:
+                self._buckets[index].value = value
+                return
+            j+=1
+            index = (initial_index + j * j) % self._capacity
 
+        if first_tomb is not None:
+            self._buckets[first_tomb] = HashEntry(key, value)
+            self._size += 1
+        else:
+            self._buckets[index] = HashEntry(key, value)
+            self._size += 1
 
 
     def resize_table(self, new_capacity: int) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+        if new_capacity < self._size:
+            return
+
+        if self._is_prime(new_capacity) is False:
+            new_capacity = self._next_prime(new_capacity)
+
+        old_buckets = self._buckets
+        self._capacity = new_capacity
+        self._buckets = DynamicArray()
+        i = 0
+        while i < self._capacity:
+            self._buckets.append(None)
+            i += 1
+        self._size = 0
+        i = 0
+        while i < old_buckets.length():
+            if old_buckets[i] is not None and old_buckets[i].is_tombstone is False:
+                self.put(old_buckets[i].key, old_buckets[i].value)
+            i += 1
 
     def table_load(self) -> float:
         """
@@ -203,13 +236,22 @@ class HashMap:
         """
         TODO: Write this implementation
         """
-        pass
+        self._index = 0
+        return self
 
     def __next__(self):
         """
         TODO: Write this implementation
         """
-        pass
+
+        while self._index < self._capacity:
+            if self._buckets[self._index] is not None and self._buckets[self._index].is_tombstone is False:
+                n = self._buckets[self._index]
+                self._index += 1
+                return n
+            else:
+                self._index += 1
+        raise StopIteration
 
 
 # ------------------- BASIC TESTING ---------------------------------------- #
