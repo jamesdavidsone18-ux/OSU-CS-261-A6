@@ -89,7 +89,15 @@ class HashMap:
         """
         TODO: Write this implementation
         """
-        pass
+        if self.table_load() >= 0.5:
+            self.resize_table(self._capacity * 2)
+        initial_index = self._hash_function(key) % self._capacity
+        index = initial_index
+        j = 0
+        first_tomb = None
+
+
+
 
     def resize_table(self, new_capacity: int) -> None:
         """
@@ -101,43 +109,95 @@ class HashMap:
         """
         TODO: Write this implementation
         """
-        pass
+        result = self._size / self._capacity
+        return result
 
     def empty_buckets(self) -> int:
         """
         TODO: Write this implementation
         """
-        pass
+        empty_count = 0
+        i = 0
+        while i < self._buckets.length():
+            if self._buckets[i] is None or self._buckets[i].is_tombstone is True:
+                empty_count += 1
+            i += 1
+        return empty_count
 
     def get(self, key: str) -> object:
         """
         TODO: Write this implementation
         """
-        pass
+
+        initial_index = self._hash_function(key) % self._capacity
+        index = initial_index
+        j = 0
+        while self._buckets[index] is not None:
+            if self._buckets[index].key == key and self._buckets[index].is_tombstone is False:
+                return self._buckets[index].value
+            else:
+                j += 1
+                index = (initial_index + j * j) % self._capacity
+        return
+
+
 
     def contains_key(self, key: str) -> bool:
         """
         TODO: Write this implementation
         """
-        pass
+        initial_index = self._hash_function(key) % self._capacity
+        index = initial_index
+        j = 0
+        while self._buckets[index] is not None:
+            if self._buckets[index].key == key and self._buckets[index].is_tombstone is False:
+                return True
+            else:
+                j += 1
+                index = (initial_index + j * j) % self._capacity
+        return False
 
     def remove(self, key: str) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+        initial_index = self._hash_function(key) % self._capacity
+        index = initial_index
+        j = 0
+        while self._buckets[index] is not None:
+            if self._buckets[index].key == key and self._buckets[index].is_tombstone is False:
+                self._buckets[index].is_tombstone = True
+                self._size -= 1
+                return
+            else:
+                j += 1
+                index = (initial_index + j * j) % self._capacity
+        return
 
     def get_keys_and_values(self) -> DynamicArray:
         """
         TODO: Write this implementation
         """
-        pass
+        new_da = DynamicArray()
+
+        i = 0
+        while i < self._buckets.length():
+            if self._buckets[i] is not None and self._buckets[i].is_tombstone is False:
+                result = (self._buckets[i].key, self._buckets[i].value)
+                new_da.append(result)
+            i += 1
+        return new_da
 
     def clear(self) -> None:
         """
         TODO: Write this implementation
         """
-        pass
+
+        i = 0
+        while i < self._buckets.length():
+            self._buckets[i] = None
+            i += 1
+        self._size = 0
 
     def __iter__(self):
         """
